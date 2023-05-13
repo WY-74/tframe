@@ -1,23 +1,28 @@
 from typing import Dict
+from dataclasses import dataclass
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver import ActionChains, Keys
+
+@dataclass
+class TimeOut:
+    normal: int = 10
 
 
 class Tool:
     def __init__(self, driver):
         self.driver = driver
         self.split_symbol = "@"
-
-    def open(self, url: str):
-        self.driver.get(url)
-
-    def _refresh(self):
-        self.driver.refresh()
-
-    def _back(self):
-        self.driver.back()
-
-    def _click(self, locator: str):
-        self.driver.find_element(By.CSS_SELECTOR, locator).click()
+    
+    def _click_and_confirm(self, click_locator: str, target_locator):
+        def _inner(driver):
+            self.driver.find_element(By.CSS_SELECTOR, click_locator).click()
+            return self.driver.find_element(By.CSS_SELECTOR, target_locator)
+        return _inner
+    
+    def cilck_until(self, locators: tuple[str, str], time_out:int = TimeOut.normal):
+        elem = WebDriverWait(self.driver, time_out).until(self._click_and_confirm(*locators), message="并未通过点击找到期望元素")
+        return elem
 
     def action_flow(self, actions: Dict[str, str]):
         for action in actions:
@@ -34,13 +39,7 @@ class Tool:
             return [e.text for e in elements]
         else:
             return [e.get_attribute(attr) for e in elements]
-
-    # def get_all_attributes(self, locators: List[Tuple[str, str]] | str) -> List:
-    #     attr_list = []
-    #     for locator in locators:
-    #         element = self.driver.find_element(By.CSS_SELECTOR, locator[0])
-    #         if (attr := locator[1]) == "text":
-    #             attr_list.append(element.text)
-    #         else:
-    #             attr_list.append(element.get_attribute(attr))
-    #     return attr_list
+        
+    def keyboard_enter(self, actions: Dict[str, str]):
+        self.action_flow(actions=actions)
+        ActionChains(self.driver).key_down(Keys.ENTER).perform()
