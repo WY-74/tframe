@@ -20,7 +20,7 @@
 - 命令行启动浏览器
     - mac：Google\ Chrome -–remote-debugging-port=9000
     - windows：chrome -–remote-debugging-port=9000
-- 执行代码即可
+- 完成上述操作后执行代码即可
 
 ## Selenium封装
 - 路径: `pages/tool`
