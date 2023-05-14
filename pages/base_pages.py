@@ -9,7 +9,7 @@ class TimeOut:
     normal: int = 10
 
 
-class Tool:
+class BasePages:
     def __init__(self, driver):
         self.driver = driver
         self.split_symbol = "@"
@@ -20,7 +20,15 @@ class Tool:
             return self.driver.find_element(By.CSS_SELECTOR, target_locator)
         return _inner
     
-    def cilck_until(self, locators: tuple[str, str], time_out:int = TimeOut.normal):
+    def get_attributes(self, data: str):
+        locator, attr = data.split(self.split_symbol)
+        elements = self.driver.find_elements(By.CSS_SELECTOR, locator)
+        if attr == "text":
+            return [e.text for e in elements]
+        else:
+            return [e.get_attribute(attr) for e in elements]
+        
+    def cilck_until_find(self, locators: tuple[str, str], time_out:int = TimeOut.normal):
         elem = WebDriverWait(self.driver, time_out).until(self._click_and_confirm(*locators), message="并未通过点击找到期望元素")
         return elem
 
@@ -31,14 +39,6 @@ class Tool:
                 self.driver.find_element(By.CSS_SELECTOR, locator).send_keys(text)
             if "click" in action:
                 self.driver.find_element(By.CSS_SELECTOR, actions[action]).click()
-
-    def get_attributes(self, data: str):
-        locator, attr = data.split(self.split_symbol)
-        elements = self.driver.find_elements(By.CSS_SELECTOR, locator)
-        if attr == "text":
-            return [e.text for e in elements]
-        else:
-            return [e.get_attribute(attr) for e in elements]
         
     def keyboard_enter(self, actions: Dict[str, str]):
         self.action_flow(actions=actions)

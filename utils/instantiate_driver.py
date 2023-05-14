@@ -1,5 +1,5 @@
 from selenium import webdriver
-from env import ENV
+from utils.env import ENV
 
 def instantiate_driver():
     options = webdriver.ChromeOptions()
