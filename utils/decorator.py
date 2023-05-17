@@ -1,4 +1,5 @@
 import time
+import yaml
 from typing import Callable
 
 
@@ -15,5 +16,27 @@ def exception_capture(func: Callable):
                 f.write(driver.page_source)
             # TODO: 后续需要完善将截图和page source添加到allure报告中
             raise Exception
-        
+
+    return inner
+
+
+def save_cookies(func: Callable):
+    def inner(*args, **kwargs):
+        func(*args, **kwargs)
+        driver = args[0].driver
+        cookies = driver.get_cookies()
+        with open(f"cookies.yaml", "w") as f:
+            yaml.safe_dump(cookies, f)
+
+    return inner
+
+
+def load_cookies(func: Callable):
+    def inner(*args, **kwargs):
+        driver = args[0].driver
+        cookies = yaml.safe_load(open("cookies.yaml"))
+        for c in cookies:
+            driver.add_cookie(c)
+        func(*args, **kwargs)
+
     return inner
