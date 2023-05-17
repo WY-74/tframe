@@ -1,13 +1,16 @@
 from selenium import webdriver
-from utils.env import ENV
+from conftest import ENV
+
 
 def instantiate_driver():
-    options = webdriver.ChromeOptions()
+    browser = ENV["browser"]
+    options = getattr(webdriver, f"{browser}Options")()
     options.page_load_strategy = 'eager'
-    if ENV.CHROME_DEBUG:
+
+    if ENV["debugger"]:
         options.debugger_address = "localhost:9000"
 
-    driver = webdriver.Chrome(options=options)
+    driver = getattr(webdriver, ENV["browser"])(options=options)
     driver.maximize_window()
     driver.implicitly_wait(3)
 

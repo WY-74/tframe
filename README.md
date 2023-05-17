@@ -15,28 +15,22 @@ root
 测试类命名需要以 Test 开头, 测试函数命名需要以 test_ 开头
 ```
 
-## 环境配置
-### 1.1 debugger
-在框架中提供了便捷使用debugger_address的方法,因此我们需要配置浏览器为可复用状态
-#### 1.1.1 配置浏览器环境
+## 命令行功能
+**注意:** 支持pytest所有的命令行功能
+### --debugger
+在框架中提供了便捷使用debugger_address的方法,前提是我们需要配置浏览器为可复用状态
+#### 1.1 配置浏览器环境
 - 找到Chrome启动路径
     - mac的启动路径通常为: `/Applications/Google\ Chrome.app/Contents/MacOS`
     - windows可通过右键查看程序属性, 属性中的 `目标(不包含最后的\chrome.exe)` 即为启动路径
 - 将启动路径配置到环境变量中, 并重启终端
-#### 1.1.2 使用
-- **特别注意**:在使用前关闭所有Chrome已有进程
-- 启动/关闭debugger():
-    - **注意:** 我们通过临时设置环境变量以决定debugger是否生效。这意味着当重启终端之后配置便会失效(推荐使用这种方法设置环境变量, 因为我们不希望总以debug的方式运行代码)。
-    - mac:
-        - 启动: `export CHROME_DEBUG=1`
-        - 关闭: `重启终端` 或者 `unset CHROME_DEBUG`
-    - windows:
-        - 启动: `set CHROME_DEBUG=1`
-        - 关闭: `重启终端` 或者 `set CHROME_DEBUG=`
-- 命令行启动浏览器
-    - mac：`Google\ Chrome --remote-debugging-port=9000`
-    - windows：`chrome -–remote-debugging-port=9000`
-- 完成上述操作后执行代码即可
+#### 1.2 使用
+- **特别注意**: 在使用前关闭所有Chrome已有进程
+- 该功能默认是关闭状态, 若想开启请在执行命令时设置 `--debugger=True`
+### --browser
+我们可以选择不同的浏览器(目前仅支持Firefox和Chrome)收到自动化控制
+#### 1.1 使用
+- 默认使用的是Chrome, 当我们想使用Firefox时请设置 `--browser=Firefox`
 
 ## 常用数据结构
 **注意**: 此节阐述命名将会在下文中保持一致
@@ -62,7 +56,7 @@ locator = "locator"
 - 路径: `pages/base_pages`
 - `self.driver`: 实例化的driver
 - `self.split_symbol = "@"`: 用于分隔的特殊字符
-### open
+### open -> None
 - 打开一个网址
 - 参数: url
     - url -> str: 完整的url
@@ -93,7 +87,7 @@ locator = "locator"
     - box_locator -> str: 下拉框的定位器
     - menu_locator -> str: 展开后整体列表的定位器
     - item -> str: 期望选择的列表中的条目的文本
-### action_flow
+### action_flow -> None
 - 完成一系列点击, 输入, 下拉框选择的流程
 - 参数: actions
 ### keyboard_enter -> None
