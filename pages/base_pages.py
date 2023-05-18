@@ -35,6 +35,7 @@ class BasePages:
         arg = args[0]
         if isinstance(arg, str):
             self.must_get_element(arg)
+            self.driver.execute_script(f"document.querySelector(\"{arg}\").scrollIntoView()")
             return self.driver.find_elements(By.CSS_SELECTOR, arg)
         elif isinstance(arg, WebElement):
             return [arg]
@@ -57,7 +58,7 @@ class BasePages:
             message=f"[Err]: the button or expected element is not found: {target_locator}",
         )
 
-    def click_element(self, web: str | WebElement) -> None:
+    def scroll_and_click(self, web: str | WebElement) -> None:
         element = self._status_hack(web)[0]
         element.click()
 
@@ -78,9 +79,9 @@ class BasePages:
     def select_dropdown(self, box_locator: str, menu_locator: str, item: str) -> None:
         drop_items_locator = "a"
 
-        self.click_element(box_locator)
+        self.scroll_and_click(box_locator)
         self.must_get_element(menu_locator)
-        self.click_element(self.get_element_by_text(locator=f"{menu_locator} {drop_items_locator}", text=item))
+        self.scroll_and_click(self.get_element_by_text(locator=f"{menu_locator} {drop_items_locator}", text=item))
 
     def action_flow(self, actions: Dict[str, str]):
         for do in actions:
@@ -90,7 +91,7 @@ class BasePages:
                 element = self.must_get_element(locator)
                 element.send_keys(text)
             elif action == "click":
-                self.click_element(actions[do])
+                self.scroll_and_click(actions[do])
             elif action == "dropdown":
                 box, menu, item = actions[do].split(self.split_symbol)
                 self.select_dropdown(box, menu, item)

@@ -68,8 +68,8 @@ locator = "locator"
 - 参数: button_locator, target_locator, time_out:
     - button_locator: 待点击按钮的定位器, 
     - target_locator: 第二个字符串是期望点击后出现元素的定位器
-### click_element -> None
-- 找到元素并点击
+### scroll_and_click -> None
+- 滑动到元素并点击
 - 参数: web
     - web -> str|WebElement: 待点击的元素或该元素的定位器
 ### get_element_by_text -> WebElement
