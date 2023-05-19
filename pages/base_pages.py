@@ -1,11 +1,11 @@
-from typing import Dict, List, Union
+from typing import Dict, List
 from dataclasses import dataclass
 
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains, Keys
+from playwright.sync_api import sync_playwright
 
 
 @dataclass
@@ -13,7 +13,7 @@ class TimeOut:
     normal: int = 10
 
 
-class BasePages:
+class SeleniumBasePages:
     def __init__(self, driver):
         self.driver = driver
         self.split_symbol = "@"
@@ -99,3 +99,12 @@ class BasePages:
     def keyboard_enter(self, actions: Dict[str, str]) -> None:
         self.action_flow(actions=actions)
         ActionChains(self.driver).key_down(Keys.ENTER).perform()
+
+
+class PlaywrightBasePage:
+    def __init__(self, playwright):
+        self.playwright = playwright
+        self.split_symbol = "@"
+
+    def open(self, url: str):
+        self.playwright.goto(url)

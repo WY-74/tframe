@@ -15,31 +15,51 @@ root
 测试类命名需要以 Test 开头, 测试函数命名需要以 test_ 开头
 ```
 
+## 相关配置
+- playwright相关依赖: `python -m playwright install`
+- Chrome复用环境:
+    - 找到Chrome启动路径
+        - mac的启动路径通常为: `/Applications/Google\ Chrome.app/Contents/MacOS`
+        - windows可通过右键查看程序属性, 属性中的 `目标(不包含最后的\chrome.exe)` 即为启动路径
+    - 将启动路径配置到环境变量中, 并重启终端
+
 ## 命令行功能
 **注意:** 支持pytest所有的命令行功能
-### --debugger
-在框架中提供了便捷使用debugger_address的方法,前提是我们需要配置浏览器为可复用状态
-#### 1.1 配置浏览器环境
-- 找到Chrome启动路径
-    - mac的启动路径通常为: `/Applications/Google\ Chrome.app/Contents/MacOS`
-    - windows可通过右键查看程序属性, 属性中的 `目标(不包含最后的\chrome.exe)` 即为启动路径
-- 将启动路径配置到环境变量中, 并重启终端
-#### 1.2 使用
+### --suite
+框架内包含了Selenium与Playwright两种方式 (目前Playwright还未完全加入, 只是提供了切换入口, 因此请使用Selenium)
+- 我们必须在执行时进行设置:
+```shell
+python -m pytest <路径> --suite=selenium
+```
+```shell
+python -m pytest <路径> --suite=playwright
+```
+### --debugger (Only selenium) (Only chrome)
+在框架中提供了便捷使用debugger_address的方法, 前提是我们需要配置浏览器为可复用状态
 - **特别注意**: 在使用前关闭所有Chrome已有进程
-- 该功能默认是关闭状态, 若想开启请在执行命令时设置 `--debugger=True`
-### --browser
+- 该功能默认是关闭状态, 若想开启请在执行命令时设置 
+```shell
+python -m pytest <路径> --suite=playwright --debugger=True
+```
+### --browser (Only selenium)
 我们可以选择不同的浏览器(目前仅支持Firefox和Chrome)收到自动化控制
-#### 1.1 使用
-- 默认使用的是Chrome, 当我们想使用Firefox时请设置 `--browser=Firefox`
+- 默认使用的是Chrome, 当我们想使用Firefox时请设置:
+```shell
+python -m pytest <路径> --suite=playwright --browser=Firefox
+```
 ### --headless
 我们可以让程序在无头模式下执行
-#### 1.1 使用
-- 默认是不会进入到无头模式执行程序的, 当我们期望通过无头模式执行程序请设置: `--headless=True`
-### --remote
+- 默认是不会进入到无头模式执行程序的, 当我们期望通过无头模式执行程序请设置:
+```shell
+python -m pytest <路径> --suite=playwright --headless=True
+```
+### --remote(Only selenium)
 本框架提供了capabilities+分布式的执行方式, 目前的环境为: https://selenium-node.hogwarts.ceshiren.com/ui#, 这仅仅是为了测试入口, 后期我们会搭建属于自己的分布式环境
-#### 1.1 使用
 - 默认不会进行分布式执行, 因此但我们需要在某个节点进行分布式执行时需要先配置 `utils/capabilities.py`
-- 通过命令行执行程序, 并且设置: `--remote=True`
+- 并且在执行程序时设置:
+```shell
+python -m pytest <路径> --suite=playwright --remote=True
+```
 ## 常用数据结构
 **注意**: 此节阐述命名将会在下文中保持一致
 - actions -> Dict[str, str]: 包含一个或多个键值对的字典
@@ -60,7 +80,7 @@ locator = "locator"
 - time_out -> int: 通常作为可选参数, 用来控制等待的时长, 默认为10s。
 
 
-## Selenium封装
+## Selenium
 - 路径: `pages/base_pages`
 - `self.driver`: 实例化的driver
 - `self.split_symbol = "@"`: 用于分隔的特殊字符
@@ -102,6 +122,8 @@ locator = "locator"
 - 在一系列流程结束以后模拟键盘的Enter键进行提交
 - 参数: actions
 
+## Playwright
+**注意:** Playwright当前并未完全被封装, 因此我们目前只是提供了切换Selenium和Playwright的入口, 后续我们会持续封装Playwright, 保证只通过 `--suite` 就可以随意切换不影响各个函数名
 
 ## 可用装饰器
 - 路径: `utils/decorator`
@@ -116,4 +138,5 @@ locator = "locator"
 
 ## 官方文档
 - [Selenium](https://www.selenium.dev/documentation/)
+- [Playwright]("https://playwright.dev/python/")
 
