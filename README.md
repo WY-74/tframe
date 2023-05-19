@@ -138,5 +138,5 @@ locator = "locator"
 
 ## 官方文档
 - [Selenium](https://www.selenium.dev/documentation/)
-- [Playwright]("https://playwright.dev/python/")
+- [Playwright](https://playwright.dev/python/)
 
