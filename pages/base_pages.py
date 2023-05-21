@@ -1,11 +1,11 @@
 from typing import Dict, List
 from dataclasses import dataclass
+from utils.decorator import avoid_popups
 
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
-from playwright.sync_api import sync_playwright
 
 
 @dataclass
@@ -31,16 +31,27 @@ class SeleniumBasePages:
 
         return _get
 
-    def _status_hack(self, *args) -> WebElement | List[WebElement]:
-        arg = args[0]
-        if isinstance(arg, str):
-            self.must_get_element(arg)
-            self.driver.execute_script(f"document.querySelector(\"{arg}\").scrollIntoView()")
-            return self.driver.find_elements(By.CSS_SELECTOR, arg)
-        elif isinstance(arg, WebElement):
-            return [arg]
-        elif isinstance(arg, list):
-            return arg
+    def _scroll_to_element(self, element: WebElement):
+        element_location = element.location['y'] - 130
+        element_location = 0 if element_location < 0 else element_location
+        self.driver.execute_script(f"window.scrollTo(0, {str(element_location)})")
+
+    def _status_hack(
+        self, eol: str | WebElement | List[WebElement], index: int = None
+    ) -> WebElement | List[WebElement]:
+        if isinstance(eol, str):
+            self.must_get_element(eol)
+            elements = self.driver.find_elements(By.CSS_SELECTOR, eol)
+            if index != None:
+                element = elements[index]
+                self._scroll_to_element(element)
+                return element
+            return elements
+        elif isinstance(eol, WebElement):
+            self._scroll_to_element(eol)
+            return eol
+        elif isinstance(eol, list):
+            return eol
         else:
             raise Exception("[Err]: missing valid locator or elements")
 
@@ -58,8 +69,9 @@ class SeleniumBasePages:
             message=f"[Err]: the button or expected element is not found: {target_locator}",
         )
 
-    def scroll_and_click(self, web: str | WebElement) -> None:
-        element = self._status_hack(web)[0]
+    @avoid_popups
+    def scroll_and_click(self, eol: str | WebElement) -> None:
+        element = self._status_hack(eol, 0)
         element.click()
 
     def get_element_by_text(self, locator: str, text: str) -> WebElement:
@@ -70,8 +82,8 @@ class SeleniumBasePages:
             if attr == text:
                 return elements[i]
 
-    def get_attributes(self, attr: str, web: str | List[WebElement]) -> List[str]:
-        elements = self._status_hack(web)
+    def get_attributes(self, attr: str, eol: str | List[WebElement]) -> List[str]:
+        elements = self._status_hack(eol)
         attr_list = [e.text for e in elements] if attr == "text" else [e.get_attribute(attr) for e in elements]
 
         return attr_list

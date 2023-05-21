@@ -1,3 +1,6 @@
 class DemoData:
     def url(self):
-        return "https://www.sogou.com"
+        return "https://weibo.com/"
+
+    def actions(self):
+        return {""}

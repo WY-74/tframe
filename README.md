@@ -97,18 +97,18 @@ locator = "locator"
     - button_locator: 待点击按钮的定位器, 
     - target_locator: 第二个字符串是期望点击后出现元素的定位器
 ### scroll_and_click -> None
-- 滑动到元素并点击
-- 参数: web
-    - web -> str|WebElement: 待点击的元素或该元素的定位器
+- 滑动到元素并点击, 当定位器定位到多个元素时只会点击第一个元素
+- 参数: eol
+    - eol -> str|WebElement: 待点击的元素或该元素的定位器
 ### get_element_by_text -> WebElement
 - 找到第一个文本符合期望文本的元素
 - 参数: locator, text
     - text -> str: 期望文本
 ### get_attributes -> List[str]
 - 以列表的形式返回一类元素的同一种属性值
-- 参数: attr, web
+- 参数: attr, eol
     - attr -> str: 属性名
-    - web -> str|List[WebElement]: 元素的定位器或存放元素的列表
+    - eol -> str|List[WebElement]: 元素的定位器或存放元素的列表
 ### select_dropdown -> None
 - 选择一个下拉列表中的元素
 - 参数: box_locator, menu_locator, item

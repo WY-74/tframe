@@ -1,6 +1,10 @@
 import time
 import yaml
 from typing import Callable
+from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.webdriver.common.by import By
+
+close_popups_locator = "button[class*='LoginPop']"
 
 
 def exception_capture(func: Callable):
@@ -38,5 +42,18 @@ def load_cookies(func: Callable):
         for c in cookies:
             driver.add_cookie(c)
         func(*args, **kwargs)
+
+    return inner
+
+
+def avoid_popups(func: Callable):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ElementClickInterceptedException:
+            driver = args[0].driver
+            driver.find_element(By.CSS_SELECTOR, close_popups_locator).click()
+            print("The popups closed")
+            return func(*args, **kwargs)
 
     return inner
