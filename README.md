@@ -25,8 +25,9 @@ root
 
 ## 命令行功能
 **注意:** 支持pytest所有的命令行功能
-### --suite
-框架内包含了Selenium与Playwright两种方式 (目前Playwright还未完全加入, 只是提供了切换入口, 因此请使用Selenium)
+### 通用命令
+#### --suite
+框架内包含了Selenium, Playwright和Appium, 因此可以通过设置`--suite`切换模块(目前Playwright还未完全加入, 只是提供了切换入口)
 - 我们必须在执行时进行设置:
 ```shell
 python -m pytest <路径> --suite=selenium
@@ -34,31 +35,45 @@ python -m pytest <路径> --suite=selenium
 ```shell
 python -m pytest <路径> --suite=playwright
 ```
-### --debugger (Only selenium) (Only chrome)
-在框架中提供了便捷使用debugger_address的方法, 前提是我们需要配置浏览器为可复用状态
-- **特别注意**: 在使用前关闭所有Chrome已有进程
-- 该功能默认是关闭状态, 若想开启请在执行命令时设置 
 ```shell
-python -m pytest <路径> --suite=playwright --debugger=True
+python -m pytest <路径> --suite=appium
 ```
-### --browser (Only selenium)
-我们可以选择不同的浏览器(目前仅支持Firefox和Chrome)收到自动化控制
-- 默认使用的是Chrome, 当我们想使用Firefox时请设置:
+#### --web
+此参数是在控制我们所启用的浏览器或手机平台, 但可用的参数值取决于suite的设置
+当`suite==Selenium/Playwright`时可设置:
 ```shell
-python -m pytest <路径> --suite=playwright --browser=Firefox
+python -m pytest <路径> --suite=selenium --web=Chrome
 ```
-### --headless
+```shell
+python -m pytest <路径> --suite=selenium --web=Firefox
+```
+当`suite==appium`时可设置(**注意:** 实例化appium之前您可以在 `utils/capabilities.py` 中设置capability参数):
+```shell
+python -m pytest <路径> --suite=appium --web=Android
+```
+```shell
+python -m pytest <路径> --suite=appium --web=Ios
+```
+### Selenium/Playwright环境
+#### --headless
 我们可以让程序在无头模式下执行
 - 默认是不会进入到无头模式执行程序的, 当我们期望通过无头模式执行程序请设置:
 ```shell
-python -m pytest <路径> --suite=playwright --headless=True
+python -m pytest <路径> --suite=selenium --headless=True
 ```
-### --remote(Only selenium)
+### --debugger
+在框架中提供了便捷使用debugger_address的方法, 前提是我们需要配置浏览器为可复用状态
+- **特别注意**: 在使用前关闭所有Chrome已有进程
+- 该功能默认是关闭状态, 若想开启请在执行命令时设置
+```shell
+python -m pytest <路径> --suite=selenium --debugger=True
+```
+### --remote
 本框架提供了capabilities+分布式的执行方式, 目前的环境为: https://selenium-node.hogwarts.ceshiren.com/ui#, 这仅仅是为了测试入口, 后期我们会搭建属于自己的分布式环境
 - 默认不会进行分布式执行, 因此但我们需要在某个节点进行分布式执行时需要先配置 `utils/capabilities.py`
 - 并且在执行程序时设置:
 ```shell
-python -m pytest <路径> --suite=playwright --remote=True
+python -m pytest <路径> --suite=selenium --remote=True
 ```
 ## 常用数据结构
 **注意**: 此节阐述命名将会在下文中保持一致
@@ -80,7 +95,7 @@ locator = "locator"
 - time_out -> int: 通常作为可选参数, 用来控制等待的时长, 默认为10s。
 
 
-## Selenium
+## Selenium环境
 - 路径: `pages/base_pages`
 - `self.driver`: 实例化的driver
 - `self.split_symbol = "@"`: 用于分隔的特殊字符
@@ -122,8 +137,10 @@ locator = "locator"
 - 在一系列流程结束以后模拟键盘的Enter键进行提交
 - 参数: actions
 
-## Playwright
+## Playwright环境
 **注意:** Playwright当前并未完全被封装, 因此我们目前只是提供了切换Selenium和Playwright的入口, 后续我们会持续封装Playwright, 保证只通过 `--suite` 就可以随意切换不影响各个函数名
+
+## Appium环境
 
 ## 可用装饰器
 - 路径: `utils/decorator`
