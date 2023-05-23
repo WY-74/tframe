@@ -54,21 +54,21 @@ python -m pytest <路径> --suite=appium --web=Android
 ```shell
 python -m pytest <路径> --suite=appium --web=Ios
 ```
-### Selenium/Playwright环境
+### Selenium/Playwright可用命令
 #### --headless
 我们可以让程序在无头模式下执行
 - 默认是不会进入到无头模式执行程序的, 当我们期望通过无头模式执行程序请设置:
 ```shell
 python -m pytest <路径> --suite=selenium --headless=True
 ```
-### --debugger
+#### --debugger
 在框架中提供了便捷使用debugger_address的方法, 前提是我们需要配置浏览器为可复用状态
 - **特别注意**: 在使用前关闭所有Chrome已有进程
 - 该功能默认是关闭状态, 若想开启请在执行命令时设置
 ```shell
 python -m pytest <路径> --suite=selenium --debugger=True
 ```
-### --remote
+#### --remote
 本框架提供了capabilities+分布式的执行方式, 目前的环境为: https://selenium-node.hogwarts.ceshiren.com/ui#, 这仅仅是为了测试入口, 后期我们会搭建属于自己的分布式环境
 - 默认不会进行分布式执行, 因此但我们需要在某个节点进行分布式执行时需要先配置 `utils/capabilities.py`
 - 并且在执行程序时设置:
@@ -156,4 +156,5 @@ locator = "locator"
 ## 官方文档
 - [Selenium](https://www.selenium.dev/documentation/)
 - [Playwright](https://playwright.dev/python/)
+- [Appium](https://appium.io/docs/en/2.0/)
 
