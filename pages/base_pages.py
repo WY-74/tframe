@@ -113,10 +113,16 @@ class SeleniumBasePages:
         ActionChains(self.driver).key_down(Keys.ENTER).perform()
 
 
-class PlaywrightBasePage:
+class PlaywrightBasePages:
     def __init__(self, playwright):
         self.playwright = playwright
         self.split_symbol = "@"
 
     def open(self, url: str):
         self.playwright.goto(url)
+
+
+class AppiumBasePages:
+    def __init__(self, driver):
+        self.driver = driver
+        self.split_symbol = "@"

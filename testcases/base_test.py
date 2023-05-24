@@ -7,4 +7,4 @@ class BaseTest:
         self.web = instantiate_driver()
 
     def teardown_class(self):
-        self.web.quit() if ENV["suite"] == "selenium" else self.web.close()
+        self.web.close() if ENV["suite"] == "playwright" else self.web.quit()

@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from data.demo.demo_data import DemoData
 from pages.demo.demo_pages import DemoPages
@@ -13,6 +14,5 @@ class TestDemo(BaseTest):
         self.data = DemoData()
 
     @exception_capture
-    @pytest.mark.parametrize()
-    def test_01_get_list(self):
-        self.page.navigate(self.data.url())
+    def test_01(self):
+        """Define the case that belong to the module"""
