@@ -1,6 +1,3 @@
-import pytest
-import time
-
 from data.demo.demo_data import DemoData
 from pages.demo.demo_pages import DemoPages
 from testcases.base_test import BaseTest

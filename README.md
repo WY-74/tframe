@@ -22,12 +22,18 @@ root
         - mac的启动路径通常为: `/Applications/Google\ Chrome.app/Contents/MacOS`
         - windows可通过右键查看程序属性, 属性中的 `目标(不包含最后的\chrome.exe)` 即为启动路径
     - 将启动路径配置到环境变量中, 并重启终端
+- appium环境依赖
+    - [安装JDK](https://github.com/WY-74/fragmented-notes/blob/master/base/002.md)
+    - [安装SDK](https://github.com/WY-74/fragmented-notes/blob/master/base/003.md)
+    - 安装Node.js
+    - 安装Appium Server: `sudo npm install -g appium`
+    - 安装环境监测工具: `sudo npm install -g appium-doctor`
 
 ## 命令行功能
 **注意:** 支持pytest所有的命令行功能
 ### 通用命令
 #### --suite
-框架内包含了Selenium, Playwright和Appium, 因此可以通过设置`--suite`切换模块(目前Playwright还未完全加入, 只是提供了切换入口)
+框架内包含了Selenium, Playwright和Appium, 因此可以通过设置`--suite`切换模块(目前Playwright和Appium还未完全加入, 只是提供了切换入口)
 - 我们必须在执行时进行设置:
 ```shell
 python -m pytest <路径> --suite=selenium

@@ -21,7 +21,8 @@ def instantiate_driver():
 
 
 def instantiate_selenium() -> WebDriver:
-    if _web := ENV["web"] != "Chrome" and _web != "Firefox":
+    _web = ENV["web"]
+    if _web != "Chrome" and _web != "Firefox":
         raise Exception("[Err]: In selenium environment, please set up 'Chrome' or 'Firefox' via --web")
     headless = bool(ENV["headless"])
     if not ENV["remote"]:
@@ -51,7 +52,8 @@ def instantiate_playwright():
 
 
 def instantiate_appium():
-    if _web := ENV["web"] != "Android" and _web != "Ios":
+    _web = ENV["web"]
+    if _web != "Android" and _web != "Ios":
         raise Exception("[Err]: In appium environment, please set up 'Android' or 'Ios' via --web")
     _caps = APPIUM_ANDROID_CAPS if _web == "Android" else APPIUM_IOS_CAPS
 
