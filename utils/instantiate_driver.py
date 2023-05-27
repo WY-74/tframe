@@ -1,3 +1,4 @@
+import random
 from selenium import webdriver as sw
 from selenium.webdriver.remote.webdriver import WebDriver
 from playwright.sync_api import sync_playwright
@@ -5,6 +6,7 @@ from appium import webdriver as aw
 
 from conftest import ENV
 from utils.capabilities import SELENIUM_CAPS, APPIUM_ANDROID_CAPS, APPIUM_IOS_CAPS
+from utils.user_agent import UA
 
 
 def instantiate_driver():
@@ -28,12 +30,19 @@ def instantiate_selenium() -> WebDriver:
     if not ENV["remote"]:
         options = getattr(sw, f"{_web}Options")()
         options.page_load_strategy = 'eager'
+        ua = UA[random.randint(0, len(UA))]
+        print(f"useragent: {ua}")
+        options.add_argument(f'user-agent= + {ua}')
         if headless:
             options.add_argument('--headless')
             options.add_argument('--no-sandbox')
             options.add_argument('--disable-dev-shm-usage')
+
+        options.add_experimental_option('excludeSwitches', ['enable-automation'])
+
         if ENV["debugger"]:
             options.debugger_address = "localhost:9000"
+
         web = getattr(sw, _web)(options=options)
         web.maximize_window()
         web.implicitly_wait(3)

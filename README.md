@@ -125,6 +125,12 @@ locator = "locator"
 - 找到第一个文本符合期望文本的元素
 - 参数: locator, text
     - text -> str: 期望文本
+### get_element_by_childtext -> WebElement|None
+- 返回第一个字元素文本符合要求的父元素
+- 参数: locator, child_locator, text, complete
+    - child_locator -> str: 子元素的定位器
+    - text -> str: 期望文本
+    - complete -> bool: 判断文本时是否完全匹配, 默认为True
 ### get_attributes -> List[str]
 - 以列表的形式返回一类元素的同一种属性值
 - 参数: attr, eol

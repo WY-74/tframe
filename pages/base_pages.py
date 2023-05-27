@@ -82,6 +82,18 @@ class SeleniumBasePages:
             if attr == text:
                 return elements[i]
 
+    def get_element_by_childtext(
+        self, locator: str, child_locator: str, text: str, complete: bool = True
+    ) -> WebElement | None:
+        roots = self._status_hack(locator)
+        for root in roots:
+            _text = root.find_element(By.CSS_SELECTOR, child_locator).text
+            if compile and _text == text:
+                return root
+            if not compile and text in _text:
+                return root
+        return None
+
     def get_attributes(self, attr: str, eol: str | List[WebElement]) -> List[str]:
         elements = self._status_hack(eol)
         attr_list = [e.text for e in elements] if attr == "text" else [e.get_attribute(attr) for e in elements]
