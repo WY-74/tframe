@@ -146,5 +146,11 @@ class RequestsBase:
     def __init__(self, driver: None):
         self.methods = data_sets.Methods()
 
-    def http_methods(self, method: data_sets.Methods(), url: str, params: Dict[str, str | int]):
-        return requests.request(method, url, params=params)
+    def http_methods(
+        self,
+        method: data_sets.Methods(),
+        url: str,
+        params: Dict[str, str | int] | None = None,
+        headers: Dict[str, str | int] | None = None,
+    ):
+        return requests.request(method, url, params=params, headers=headers)
