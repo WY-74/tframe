@@ -1,11 +1,13 @@
+import requests
 from typing import Dict, List
 from dataclasses import dataclass
-from utils.decorator import avoid_popups
-
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
+
+from utils import data_sets
+from utils.decorator import avoid_popups
 
 
 @dataclass
@@ -138,3 +140,11 @@ class AppiumBasePages:
     def __init__(self, driver):
         self.driver = driver
         self.split_symbol = "@"
+
+
+class RequestsBase:
+    def __init__(self, driver: None):
+        self.methods = data_sets.Methods()
+
+    def http_methods(self, method: data_sets.Methods(), url: str, params: Dict[str, str | int]):
+        return requests.request(method, url, params=params)

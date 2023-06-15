@@ -10,12 +10,15 @@ from utils.user_agent import UA
 
 
 def instantiate_driver():
-    if ENV["suite"] == "selenium":
+    web = ENV["suite"]
+    if web == "selenium":
         web = instantiate_selenium()
-    elif ENV["suite"] == "playwright":
+    elif web == "playwright":
         web = instantiate_playwright()
-    elif ENV["suite"] == "appium":
+    elif web == "appium":
         web = instantiate_appium()
+    elif web == "requests":
+        pass
     else:
         raise Exception("[Err]: Please set up 'selenium', 'playwriht' or 'appium' via --suite")
 

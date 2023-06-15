@@ -16,6 +16,7 @@ root
 ```
 
 ## 相关配置
+- 框架依赖库安装 `pip install -r requirements.frozen`
 - playwright相关依赖: `python -m playwright install`
 - Chrome复用环境:
     - 找到Chrome启动路径
@@ -154,6 +155,15 @@ locator = "locator"
 
 ## Appium环境
 
+## Requests环境
+### **http_methods**
+- method -> Method: 请求方法【 GET | POST | PUT | DELETE 】
+- url -> str: URL
+- params -> Dict[str, str|int]: url参数信息
+
+一个最为基础的请求方法. 为了避免手动输入可能造成的错误, 我们已经有了预设的method:`utils/data_sets.py::Method`, 因此当我们使用 `http_methods` 方法时可以通过调用 `Method` 传入 `method` 参数.
+
+
 ## 可用装饰器
 - 路径: `utils/decorator`
 ### exception_capture
@@ -169,4 +179,5 @@ locator = "locator"
 - [Selenium](https://www.selenium.dev/documentation/)
 - [Playwright](https://playwright.dev/python/)
 - [Appium](https://appium.io/docs/en/2.0/)
+- [Requests](https://requests.readthedocs.io/en/latest/#)
 
