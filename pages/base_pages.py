@@ -1,4 +1,5 @@
 import requests
+from requests import Response
 from typing import Dict, List
 from dataclasses import dataclass
 from selenium.webdriver.remote.webelement import WebElement
@@ -152,5 +153,9 @@ class RequestsBase:
         url: str,
         params: Dict[str, str | int] | None = None,
         headers: Dict[str, str | int] | None = None,
-    ):
-        return requests.request(method, url, params=params, headers=headers)
+        json_params: Dict[str, str | int] | None = None,
+    ) -> Response:
+        return requests.request(method, url, params=params, headers=headers, json=json_params)
+
+    def assert_status_code(self, response: Response, e_status: int):
+        assert response.status_code == e_status

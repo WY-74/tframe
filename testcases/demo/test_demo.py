@@ -13,7 +13,6 @@ class TestDemo(BaseTest):
     def test_01(self):
         """Define the case that belong to the module"""
         params = {"params": "wangyun"}
-        headers = {"User-Agent": "wangyun-macpro"}
 
-        result = self.page.http_methods(Methods.post, "https://httpbin.ceshiren.com/post", params, headers)
-        print(result.text)
+        result = self.page.http_methods(Methods.post, "https://httpbin.ceshiren.com/post", json_params=params)
+        self.page.assert_status_code(result, 200)
