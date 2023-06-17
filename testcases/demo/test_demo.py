@@ -12,7 +12,8 @@ class TestDemo(BaseTest):
 
     def test_01(self):
         """Define the case that belong to the module"""
-        params = {"params": "wangyun"}
+        params = {"status": "available"}
 
-        result = self.page.http_methods(Methods.post, "https://httpbin.ceshiren.com/post", json_params=params)
-        self.page.assert_status_code(result, 200)
+        result = self.page.http_methods(Methods.get, self.data.url, params=params)
+
+        self.page.assert_json(result, self.data.want_data, "id", 9223372036854252693)

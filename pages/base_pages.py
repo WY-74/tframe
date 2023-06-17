@@ -147,6 +147,12 @@ class RequestsBase:
     def __init__(self, driver: None):
         self.methods = data_sets.Methods()
 
+    def _get_item_from_list(self, items: list, key: str, value: str):
+        for index, item in enumerate(items):
+            if item[key] == value:
+                return items[index]
+        return {}
+
     def http_methods(
         self,
         method: data_sets.Methods(),
@@ -159,3 +165,18 @@ class RequestsBase:
 
     def assert_status_code(self, response: Response, e_status: int):
         assert response.status_code == e_status
+
+    def assert_json_response(
+        self, response: Response, want: Dict[str, str | int] = {}, key: str = "", value: str | int = ""
+    ):
+        if not want:
+            print("No expected data passed in, skip assertion")
+            return
+
+        current = response.json()
+        if isinstance(current, list):
+            if not key and not value:
+                raise Exception("After the json mapping is a list, it needs a unique key and its value")
+            current = self._get_item_from_list(current, key, value)
+        for keyword in want:
+            assert current[keyword] == want[keyword]

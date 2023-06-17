@@ -170,6 +170,20 @@ locator = "locator"
 
 一个用于断言响应状态码的函数
 
+### **assert_json_response**
+- response(必填) -> Response: 传入一个响应对象
+- want -> Dict[str, str | int]= {}: 传入一组期望的数据
+- key -> str: 传入一个唯一的关键字
+- value -> str|int: 唯一关键字的对应数值
+
+当我们希望断言响应数据，并且响应的数据是json结构时可以使用此函数. 
+    
+json的响应提被映射为python可用数据对象之后会有两种情况, 一种为列表另一种为字典.
+
+当为列表时, 往往列表中的每一组元素都有一唯一的可辨别的键值对, 我们可以传入 `key` 和 `value` 来锁定该组元素
+
+当为字典时则无需 `key` 和 `value` 辅助
+
 ## 可用装饰器
 - 路径: `utils/decorator`
 ### exception_capture
