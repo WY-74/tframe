@@ -180,3 +180,11 @@ class RequestsBase:
             current = self._get_item_from_list(current, key, value)
         for keyword in want:
             assert current[keyword] == want[keyword]
+
+    def assert_key_in_json(self, response: Response, want: str):
+        rep = response.json()
+
+        if not isinstance(rep, dict):
+            raise Exception("The response result cannot be mapped to a dictionary and the method cannot be used!!")
+
+        assert want in rep.keys()
