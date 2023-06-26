@@ -9,6 +9,7 @@ from selenium.webdriver import ActionChains, Keys
 
 from utils import data_sets
 from utils.decorator import avoid_popups
+from utils.logger import Logger
 
 
 @dataclass
@@ -146,6 +147,7 @@ class AppiumBasePages:
 class RequestsBase:
     def __init__(self, driver: None):
         self.methods = data_sets.Methods()
+        self.logger = Logger(clear=True)
 
     def _get_item_from_list(self, items: list, key: str, value: str):
         for index, item in enumerate(items):
@@ -183,8 +185,15 @@ class RequestsBase:
 
     def assert_key_in_json(self, response: Response, want: str):
         rep = response.json()
+        self.logger.info("Assert key in json")
 
         if not isinstance(rep, dict):
-            raise Exception("The response result cannot be mapped to a dictionary and the method cannot be used!!")
+            war = "The response result cannot be mapped to a dictionary and the method cannot be used!!"
+            self.logger.warning(war)
+            raise Exception(war)
 
-        assert want in rep.keys()
+        try:
+            assert want in rep.keys()
+        except Exception as e:
+            self.logger.warning(f"The desired key is: {want}\nBut not in the response: {rep}")
+            raise e
