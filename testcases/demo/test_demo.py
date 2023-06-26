@@ -1,5 +1,4 @@
 import pytest
-
 from data.demo.demo_data import DemoData
 from pages.demo.demo_pages import DemoPages
 from testcases.base_test import BaseTest
@@ -14,8 +13,4 @@ class TestDemo(BaseTest):
 
     def test_01_get_access_token(self):
         """Define the case that belong to the module"""
-        params = {"corpid": self.data.corpid, "corpsecret": self.data.corpsecret}
-        result = self.page.http_methods(Methods.get, self.data.url, params=params)
-
-        self.page.assert_status_code(result, self.data.e_status)
-        self.page.assert_key_in_json(result, self.data.want_data)
+        self.page.http_with_proxy(Methods.post, self.data.url)

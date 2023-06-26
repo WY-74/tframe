@@ -165,6 +165,14 @@ class RequestsBase:
     ) -> Response:
         return requests.request(method, url, params=params, headers=headers, json=json_params)
 
+    def http_with_proxy(
+        self, method: data_sets.Methods(), url: str, http: str = "127.0.0.1:8888", https: str | None = None
+    ) -> Response:
+        https = http if https == None else https
+        proxies = {"http": f"http://{http}", "https": f"http://{https}"}
+
+        return requests.request(method, url, proxies=proxies, verify=False)
+
     def assert_status_code(self, response: Response, e_status: int):
         assert response.status_code == e_status
 

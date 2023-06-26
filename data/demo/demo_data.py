@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class DemoData:
-    url: str = "https://qyapi.weixin.qq.com/cgi-bin/gettoken"
+    url: str = "https://httpbin.ceshiren.com/post"
     e_status: str = 200
     corpid: str = "wwb316419364456d42"
     corpsecret: str = "72H_JVRwStrmaK-3aG-fRblVMS1OC-q_yrlQovUXWhQ"

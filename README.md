@@ -164,6 +164,13 @@ locator = "locator"
 - json_params -> Dict[str, str | int] | None: 传递json请求体信息
 
 一个最为基础的请求方法. 为了避免手动输入可能造成的错误, 我们已经有了预设的method: `utils/data_sets.py::Method`, 因此当我们使用 `http_methods` 方法时可以通过调用 `Method` 传入 `method` 参数.
+### **http_with_proxy**
+- method(必填) -> Method: 请求方法
+- url(必填) -> str: URL
+- http -> str: http监听地址
+- https -> str|None: https监听地址
+
+为请求增加代理, `https`默认与`http`相同, `http`默认为 `127.0.0.1:8888`
 ### **assert_status_code**
 - response(必填) -> Response: 传入一个响应对象
 - e_status(必填) -> int: 传入该响应预期的状态码
@@ -183,6 +190,12 @@ json的响应提被映射为python可用数据对象之后会有两种情况, �
 当为列表时, 往往列表中的每一组元素都有一唯一的可辨别的键值对, 我们可以传入 `key` 和 `value` 来锁定该组元素
 
 当为字典时则无需 `key` 和 `value` 辅助
+
+### **assert_key_in_json**
+- response(必填) -> Response
+- want(必填) -> str
+
+在有些情况下, 我们仅关注某个键值对是否在响应中存在(且并不在意该键值对的值), 此时可以使用该方法断言。
 
 ## 可用装饰器
 - 路径: `utils/decorator`
