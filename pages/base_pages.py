@@ -1,11 +1,15 @@
+import requests
+from requests import Response
 from typing import Dict, List
 from dataclasses import dataclass
-from utils.decorator import avoid_popups
-
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
+
+from utils import data_sets
+from utils.decorator import avoid_popups
+from utils.logger import Logger
 
 
 @dataclass
@@ -82,6 +86,18 @@ class SeleniumBasePages:
             if attr == text:
                 return elements[i]
 
+    def get_element_by_childtext(
+        self, locator: str, child_locator: str, text: str, complete: bool = True
+    ) -> WebElement | None:
+        roots = self._status_hack(locator)
+        for root in roots:
+            _text = root.find_element(By.CSS_SELECTOR, child_locator).text
+            if compile and _text == text:
+                return root
+            if not compile and text in _text:
+                return root
+        return None
+
     def get_attributes(self, attr: str, eol: str | List[WebElement]) -> List[str]:
         elements = self._status_hack(eol)
         attr_list = [e.text for e in elements] if attr == "text" else [e.get_attribute(attr) for e in elements]
@@ -126,3 +142,58 @@ class AppiumBasePages:
     def __init__(self, driver):
         self.driver = driver
         self.split_symbol = "@"
+
+
+class RequestsBase:
+    def __init__(self, driver: None):
+        self.methods = data_sets.Methods()
+        self.logger = Logger(clear=True)
+
+    def _get_item_from_list(self, items: list, key: str, value: str):
+        for index, item in enumerate(items):
+            if item[key] == value:
+                return items[index]
+        return {}
+
+    def http_methods(
+        self,
+        method: data_sets.Methods(),
+        url: str,
+        params: Dict[str, str | int] | None = None,
+        headers: Dict[str, str | int] | None = None,
+        json_params: Dict[str, str | int] | None = None,
+    ) -> Response:
+        return requests.request(method, url, params=params, headers=headers, json=json_params)
+
+    def assert_status_code(self, response: Response, e_status: int):
+        assert response.status_code == e_status
+
+    def assert_json_response(
+        self, response: Response, want: Dict[str, str | int] = {}, key: str = "", value: str | int = ""
+    ):
+        if not want:
+            print("No expected data passed in, skip assertion")
+            return
+
+        current = response.json()
+        if isinstance(current, list):
+            if not key and not value:
+                raise Exception("After the json mapping is a list, it needs a unique key and its value")
+            current = self._get_item_from_list(current, key, value)
+        for keyword in want:
+            assert current[keyword] == want[keyword]
+
+    def assert_key_in_json(self, response: Response, want: str):
+        rep = response.json()
+        self.logger.info("Assert key in json")
+
+        if not isinstance(rep, dict):
+            war = "The response result cannot be mapped to a dictionary and the method cannot be used!!"
+            self.logger.warning(war)
+            raise Exception(war)
+
+        try:
+            assert want in rep.keys()
+        except Exception as e:
+            self.logger.warning(f"The desired key is: {want}\nBut not in the response: {rep}")
+            raise e
