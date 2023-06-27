@@ -9,13 +9,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
 
 from utils import data_sets
+from utils.data_sets import TimeOut, Methods
 from utils.decorator import avoid_popups
 from utils.logger import Logger
-
-
-@dataclass
-class TimeOut:
-    normal: int = 10
 
 
 class SeleniumBasePages:
@@ -147,7 +143,6 @@ class AppiumBasePages:
 
 class RequestsBase:
     def __init__(self, driver: None):
-        self.methods = data_sets.Methods()
         self.logger = Logger(clear=True)
 
     def _get_item_from_list(self, items: list, key: str, value: str):
@@ -158,17 +153,28 @@ class RequestsBase:
 
     def http_methods(
         self,
-        method: data_sets.Methods,
+        method: Methods,
         url: str,
         params: Dict[str, str | int] | None = None,
         headers: Dict[str, str | int] | None = None,
         json_params: Dict[str, str | int] | None = None,
         data_params: Dict[str, str | int] | None = None,
+        cookies: Dict[str, str | int] | None = None,
+        timeout: TimeOut = TimeOut.fast,
     ) -> Response:
-        return requests.request(method, url, params=params, headers=headers, json=json_params, data=data_params)
+        return requests.request(
+            method,
+            url,
+            params=params,
+            headers=headers,
+            json=json_params,
+            data=data_params,
+            cookies=cookies,
+            timeout=timeout,
+        )
 
     def http_with_proxy(
-        self, method: data_sets.Methods(), url: str, http: str = "127.0.0.1:8888", https: str | None = None, **kwargs
+        self, method: Methods, url: str, http: str = "127.0.0.1:8888", https: str | None = None, **kwargs
     ) -> Response:
         https = http if https == None else https
         proxies = {"http": f"http://{http}", "https": f"http://{https}"}
@@ -177,7 +183,7 @@ class RequestsBase:
 
     def http_with_file(self, url: str, path: str, name: str = "name by tframe", filename: str = ""):
         files = {name: open(path, "rb")} if not filename else {name: (filename, open(path, "rb"))}
-        return requests.request(data_sets.Methods.post, url, files=files)
+        return requests.request(Methods.post, url, files=files)
 
     def assert_status_code(self, response: Response, e_status: int):
         assert response.status_code == e_status

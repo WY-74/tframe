@@ -7,3 +7,9 @@ class Methods:
     post: str = "post"
     put: str = "put"
     delete: str = "delete"
+
+
+@dataclass
+class TimeOut:
+    fast: int = 3
+    normal: int = 10
