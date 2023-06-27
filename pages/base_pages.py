@@ -162,8 +162,9 @@ class RequestsBase:
         params: Dict[str, str | int] | None = None,
         headers: Dict[str, str | int] | None = None,
         json_params: Dict[str, str | int] | None = None,
+        data_params: Dict[str, str | int] | None = None,
     ) -> Response:
-        return requests.request(method, url, params=params, headers=headers, json=json_params)
+        return requests.request(method, url, params=params, headers=headers, json=json_params, data=data_params)
 
     def http_with_proxy(
         self, method: data_sets.Methods(), url: str, http: str = "127.0.0.1:8888", https: str | None = None, **kwargs

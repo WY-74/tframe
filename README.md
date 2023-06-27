@@ -161,7 +161,8 @@ locator = "locator"
 - url(必填) -> str: URL
 - params -> Dict[str, str|int] | None: 传递url参数信息
 - headers -> Dict[str, str|int] | None: 传递请求头信息
-- json_params -> Dict[str, str | int] | None: 传递json请求体信息
+- json_params -> Dict[str, str | int] | None: 传递Json参数
+- data_params -> Dict[str, str | int] | None: 传递Form表单参数
 
 一个最为基础的请求方法. 为了避免手动输入可能造成的错误, 我们已经有了预设的method: `utils/data_sets.py::Method`, 因此当我们使用 `http_methods` 方法时可以通过调用 `Method` 传入 `method` 参数.
 ### **http_with_proxy**
