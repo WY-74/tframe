@@ -13,7 +13,6 @@ class TestDemo(BaseTest):
 
     def test_01_get_access_token(self):
         """Define the case that belong to the module"""
-        result = self.page.http_with_file(
-            self.data.url, "/Users/ya/wangyun/files/postman_test.txt", name="change", filename="wangyun"
-        )
-        print(result.json())
+        result = self.page.http_methods(Methods.get, self.data.url)
+
+        print(self.page.assert_xml_response(result, "//link", "http://www.nasa.gov/"))

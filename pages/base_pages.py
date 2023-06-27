@@ -1,5 +1,6 @@
 import requests
 from requests import Response
+from xml.etree import ElementTree
 from typing import Dict, List
 from dataclasses import dataclass
 from selenium.webdriver.remote.webelement import WebElement
@@ -157,7 +158,7 @@ class RequestsBase:
 
     def http_methods(
         self,
-        method: data_sets.Methods(),
+        method: data_sets.Methods,
         url: str,
         params: Dict[str, str | int] | None = None,
         headers: Dict[str, str | int] | None = None,
@@ -209,4 +210,16 @@ class RequestsBase:
             assert want in rep.keys()
         except Exception as e:
             self.logger.warning(f"The desired key is: {want}\nBut not in the response: {rep}")
+            raise e
+
+    def assert_xml_response(self, response: Response, xpath: str, want: str):
+        root = ElementTree.fromstring(response.text)
+
+        items = root.findall(f".{xpath}")
+        items = [item.text for item in items]
+
+        try:
+            assert want in items
+        except Exception as e:
+            self.logger.warning(f"The expected value '{want}' is not in {items}")
             raise e

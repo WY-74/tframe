@@ -157,40 +157,34 @@ locator = "locator"
 
 ## Requests环境
 ### **http_methods**
-- method(必填) -> Method: 请求方法【 GET | POST | PUT | DELETE 】
-- url(必填) -> str: URL
-- params -> Dict[str, str|int] | None: 传递url参数信息
-- headers -> Dict[str, str|int] | None: 传递请求头信息
-- json_params -> Dict[str, str | int] | None: 传递Json参数
-- data_params -> Dict[str, str | int] | None: 传递Form表单参数
-
 一个最为基础的请求方法. 为了避免手动输入可能造成的错误, 我们已经有了预设的method: `utils/data_sets.py::Method`, 因此当我们使用 `http_methods` 方法时可以通过调用 `Method` 传入 `method` 参数.
+- method: Method
+- url: str
+- params: Dict[str, str|int] | None
+- headers: Dict[str, str|int] | None
+- json_params: Dict[str, str | int] | None
+- data_params: Dict[str, str | int] | None
+
 ### **http_with_proxy**
-- method(必填) -> Method: 请求方法
-- url(必填) -> str: URL
-- http -> str: http监听地址
-- https -> str|None: https监听地址
-
 为请求增加代理, `https`默认与`http`相同, `http`默认为 `127.0.0.1:8888`
+- method: Method
+- url: str
+- http: str
+- https: str|None
+
 ### **http_with_file**
-- url(必填) -> str: URL
-- path(必填) -> str: 待上传文件的路径
-- name -> str: 指定请求体中name的值,
-- filename -> str: 指定请求体中filename的值
-
 一个处理上传文件接口的方法
-### **assert_status_code**
-- response(必填) -> Response: 传入一个响应对象
-- e_status(必填) -> int: 传入该响应预期的状态码
+- url: str
+- path: str
+- name: str
+- filename: str
 
+### **assert_status_code**
 一个用于断言响应状态码的函数
+- response(必填): Response
+- e_status(必填): int
 
 ### **assert_json_response**
-- response(必填) -> Response: 传入一个响应对象
-- want -> Dict[str, str | int]= {}: 传入一组期望的数据
-- key -> str: 传入一个唯一的关键字
-- value -> str|int: 唯一关键字的对应数值
-
 当我们希望断言响应数据，并且响应的数据是json结构时可以使用此函数. 
     
 json的响应提被映射为python可用数据对象之后会有两种情况, 一种为列表另一种为字典.
@@ -198,12 +192,21 @@ json的响应提被映射为python可用数据对象之后会有两种情况, �
 当为列表时, 往往列表中的每一组元素都有一唯一的可辨别的键值对, 我们可以传入 `key` 和 `value` 来锁定该组元素
 
 当为字典时则无需 `key` 和 `value` 辅助
+- response: Response
+- want: Dict[str, str | int]
+- key: str
+- value: str|int
 
 ### **assert_key_in_json**
-- response(必填) -> Response
-- want(必填) -> str
-
 在有些情况下, 我们仅关注某个键值对是否在响应中存在(且并不在意该键值对的值), 此时可以使用该方法断言。
+- response: Response
+- want: str
+
+### **assert_xml_response**
+当响应返回的内容是XML时可以使用该方法验证. 目前我们提供的验证方法时匹配符合xpth的元素, 并将这些元素的文本信息存放到列表中, 判断我们期望的数据是否在列表中
+- response: Response
+- xpath: str
+- want: str
 
 ## 可用装饰器
 - 路径: `utils/decorator`
