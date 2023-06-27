@@ -171,6 +171,13 @@ locator = "locator"
 - https -> str|None: https监听地址
 
 为请求增加代理, `https`默认与`http`相同, `http`默认为 `127.0.0.1:8888`
+### **http_with_file**
+- url(必填) -> str: URL
+- path(必填) -> str: 待上传文件的路径
+- name -> str: 指定请求体中name的值,
+- filename -> str: 指定请求体中filename的值
+
+一个处理上传文件接口的方法
 ### **assert_status_code**
 - response(必填) -> Response: 传入一个响应对象
 - e_status(必填) -> int: 传入该响应预期的状态码

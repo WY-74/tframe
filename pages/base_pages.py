@@ -166,12 +166,16 @@ class RequestsBase:
         return requests.request(method, url, params=params, headers=headers, json=json_params)
 
     def http_with_proxy(
-        self, method: data_sets.Methods(), url: str, http: str = "127.0.0.1:8888", https: str | None = None
+        self, method: data_sets.Methods(), url: str, http: str = "127.0.0.1:8888", https: str | None = None, **kwargs
     ) -> Response:
         https = http if https == None else https
         proxies = {"http": f"http://{http}", "https": f"http://{https}"}
+        self.logger.info(f"Proxy port information: {proxies}")
+        return requests.request(method, url, proxies=proxies, verify=False, **kwargs)
 
-        return requests.request(method, url, proxies=proxies, verify=False)
+    def http_with_file(self, url: str, path: str, name: str = "name by tframe", filename: str = ""):
+        files = {name: open(path, "rb")} if not filename else {name: (filename, open(path, "rb"))}
+        return requests.request(data_sets.Methods.post, url, files=files)
 
     def assert_status_code(self, response: Response, e_status: int):
         assert response.status_code == e_status

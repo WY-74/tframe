@@ -13,4 +13,7 @@ class TestDemo(BaseTest):
 
     def test_01_get_access_token(self):
         """Define the case that belong to the module"""
-        self.page.http_with_proxy(Methods.post, self.data.url)
+        result = self.page.http_with_file(
+            self.data.url, "/Users/ya/wangyun/files/postman_test.txt", name="change", filename="wangyun"
+        )
+        print(result.json())
