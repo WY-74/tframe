@@ -190,21 +190,10 @@ timeout我们也提供了预设的值: `utils/data_sets.py::TimeOut`, 且默认�
 
 ### **assert_json_response**
 当我们希望断言响应数据，并且响应的数据是json结构时可以使用此函数. 
-    
-json的响应提被映射为python可用数据对象之后会有两种情况, 一种为列表另一种为字典.
-
-当为列表时, 往往列表中的每一组元素都有一唯一的可辨别的键值对, 我们可以传入 `key` 和 `value` 来锁定该组元素
-
-当为字典时则无需 `key` 和 `value` 辅助
+Json数据可能会存在嵌套的情况, 因此我们使用该函数的过程中需要借助JsonPath尽可能的解析Json, 我们提供了 [JsonPath](https://github.com/WY-74/fragmented-notes/blob/master/base/006.md) 相关文章来帮助您熟悉JsonPath.
 - response: Response
-- want: Dict[str, str | int]
-- key: str
-- value: str|int
-
-### **assert_key_in_json**
-在有些情况下, 我们仅关注某个键值对是否在响应中存在(且并不在意该键值对的值), 此时可以使用该方法断言。
-- response: Response
-- want: str
+- want: Any
+- expr: str
 
 ### **assert_xml_response**
 当响应返回的内容是XML时可以使用该方法验证. 目前我们提供的验证方法时匹配符合xpth的元素, 并将这些元素的文本信息存放到列表中, 判断我们期望的数据是否在列表中

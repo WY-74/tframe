@@ -13,4 +13,6 @@ class TestDemo(BaseTest):
 
     def test_01_get_access_token(self):
         """Define the case that belong to the module"""
-        result = self.page.http_methods(Methods.get, self.data.url)
+        result = self.page.http_methods(Methods.post, self.data.url)
+
+        self.page.assert_json_response(result, self.data.want_data, "$..headers..User-Agent")

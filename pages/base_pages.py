@@ -1,7 +1,8 @@
 import requests
+import jsonpath
 from requests import Response
 from xml.etree import ElementTree
-from typing import Dict, List
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
@@ -145,11 +146,8 @@ class RequestsBase:
     def __init__(self, driver: None):
         self.logger = Logger(clear=True)
 
-    def _get_item_from_list(self, items: list, key: str, value: str):
-        for index, item in enumerate(items):
-            if item[key] == value:
-                return items[index]
-        return {}
+    def _get_items_by_jsonpath(self, obj, expr: str) -> list | bool:
+        return jsonpath.jsonpath(obj, expr)
 
     def http_methods(
         self,
@@ -188,44 +186,23 @@ class RequestsBase:
     def assert_status_code(self, response: Response, e_status: int):
         assert response.status_code == e_status
 
-    def assert_json_response(
-        self, response: Response, want: Dict[str, str | int] = {}, key: str = "", value: str | int = ""
-    ):
-        if not want:
-            print("No expected data passed in, skip assertion")
-            return
+    def assert_json_response(self, response: Response, want: Any, expr: str):
+        root = response.json()
+        self.logger.info(root)
 
-        current = response.json()
-        if isinstance(current, list):
-            if not key and not value:
-                raise Exception("After the json mapping is a list, it needs a unique key and its value")
-            current = self._get_item_from_list(current, key, value)
-        for keyword in want:
-            assert current[keyword] == want[keyword]
-
-    def assert_key_in_json(self, response: Response, want: str):
-        rep = response.json()
-        self.logger.info("Assert key in json")
-
-        if not isinstance(rep, dict):
-            war = "The response result cannot be mapped to a dictionary and the method cannot be used!!"
-            self.logger.warning(war)
-            raise Exception(war)
-
+        items = self._get_items_by_jsonpath(root, expr)
+        if not items:
+            self.logger.warning("JsonPath did not match the content")
         try:
-            assert want in rep.keys()
-        except Exception as e:
-            self.logger.warning(f"The desired key is: {want}\nBut not in the response: {rep}")
-            raise e
+            assert want in items
+        except Exception:
+            self.logger.warning(f"{want} not in {items}")
 
     def assert_xml_response(self, response: Response, xpath: str, want: str):
         root = ElementTree.fromstring(response.text)
-
         items = root.findall(f".{xpath}")
         items = [item.text for item in items]
-
         try:
             assert want in items
-        except Exception as e:
+        except Exception:
             self.logger.warning(f"The expected value '{want}' is not in {items}")
-            raise e

@@ -13,7 +13,7 @@ def main():
     terminal_handler = logging.StreamHandler()
     terminal_handler.setLevel(logging.WARNING)
 
-    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y-%I:%M:%S-%p")
+    formatter = logging.Formatter("[%(levelname)s - %(asctime)s] %(message)s", datefmt="%m/%d/%Y-%I:%M:%S-%p")
 
     file_handler.setFormatter(formatter)
     terminal_handler.setFormatter(formatter)
@@ -40,3 +40,4 @@ class Logger:
 
     def warning(self, message: str):
         self.logger.warning(message)
+        raise Exception(message)
