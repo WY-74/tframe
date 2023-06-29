@@ -1,7 +1,9 @@
 from pytest import Parser, Config
+from utils.logger import Logger
 
 
 ENV = {}
+logger = Logger()
 
 
 def pytest_addoption(parser: Parser):
@@ -21,12 +23,13 @@ def pytest_configure(config: Config):
     headless = config.getoption("--headless")
     debug = config.getoption("--debugger")
     remote = config.getoption("--remote")
-    print(f"{suite} -> {web}")
-    print(f"headless: {headless}")
-    print(f"debug mode: {debug}")
-    print(f"remote: {remote}")
-    ENV["suite"] = suite
-    ENV["web"] = web
-    ENV["headless"] = headless
-    ENV["debugger"] = debug
-    ENV["remote"] = remote
+    ENV.update(
+        {
+            "suite": suite,
+            "web": web,
+            "headless": headless,
+            "debugger": debug,
+            "remote": remote,
+        }
+    )
+    logger.info(ENV)
