@@ -3,7 +3,7 @@ from utils.logger import Logger
 
 
 ENV = {}
-logger = Logger()
+LOGGER = Logger()
 
 
 def pytest_addoption(parser: Parser):
@@ -32,4 +32,4 @@ def pytest_configure(config: Config):
             "remote": remote,
         }
     )
-    logger.info(ENV)
+    LOGGER.info(ENV)

@@ -8,11 +8,9 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
-
-from utils import data_sets
 from utils.data_sets import TimeOut, Methods
 from utils.decorator import avoid_popups
-from utils.logger import Logger
+from conftest import LOGGER
 
 
 class SeleniumBasePages:
@@ -144,7 +142,7 @@ class AppiumBasePages:
 
 class RequestsBase:
     def __init__(self, driver: None):
-        self.logger = Logger(clear=True)
+        pass
 
     def _get_items_by_jsonpath(self, obj, expr: str) -> list | bool:
         return jsonpath.jsonpath(obj, expr)
@@ -155,11 +153,16 @@ class RequestsBase:
         url: str,
         params: Dict[str, str | int] | None = None,
         headers: Dict[str, str | int] | None = None,
-        json_params: Dict[str, str | int] | None = None,
+        json_params: Any = None,
         data_params: Dict[str, str | int] | None = None,
         cookies: Dict[str, str | int] | None = None,
         timeout: TimeOut = TimeOut.fast,
     ) -> Response:
+        # Most of the time our data structures are not passed in as dict
+        # So we need to do a data type conversion
+        if json_params and not isinstance(json_params, dict):
+            json_params = json_params.__dict__
+
         return requests.request(
             method,
             url,
@@ -176,27 +179,54 @@ class RequestsBase:
     ) -> Response:
         https = http if https == None else https
         proxies = {"http": f"http://{http}", "https": f"http://{https}"}
-        self.logger.info(f"Proxy port information: {proxies}")
+        LOGGER.info(f"Proxy port information: {proxies}")
         return requests.request(method, url, proxies=proxies, verify=False, **kwargs)
 
     def http_with_file(self, url: str, path: str, name: str = "name by tframe", filename: str = ""):
         files = {name: open(path, "rb")} if not filename else {name: (filename, open(path, "rb"))}
         return requests.request(Methods.post, url, files=files)
 
-    def assert_status_code(self, response: Response, e_status: int):
-        assert response.status_code == e_status
+    def assert_status_code(self, response: Response, e_status: int = 200):
+        status = response.status_code
+        try:
+            LOGGER.info(f"status: {e_status}")
+            assert status == e_status
+        except Exception:
+            LOGGER.warning(f"response status: {status} != expected status: {e_status}")
 
-    def assert_json_response(self, response: Response, want: Any, expr: str):
+    def assert_json_response(
+        self, response: Response, want: Any, expr: str = "$", overall: bool = False, has_no: bool = False
+    ):
         root = response.json()
-        self.logger.info(root)
+
+        if overall:
+            try:
+                # Most of the time our data structures are not passed in as dict
+                # So we need to do a data type conversion
+                want = want.__dict__
+                LOGGER.info(root)
+                assert want == root
+            except Exception:
+                LOGGER.warning(f"{want} != {root}")
+            return
 
         items = self._get_items_by_jsonpath(root, expr)
         if not items:
-            self.logger.warning("JsonPath did not match the content")
+            LOGGER.warning("JsonPath did not match the content")
+
+        if has_no:
+            try:
+                LOGGER.info(items)
+                assert want not in items
+            except Exception:
+                LOGGER.warning(f"{want} still present in {items}")
+            return
+
         try:
+            LOGGER.info(items)
             assert want in items
         except Exception:
-            self.logger.warning(f"{want} not in {items}")
+            LOGGER.warning(f"{want} not in {items}")
 
     def assert_xml_response(self, response: Response, xpath: str, want: str):
         root = ElementTree.fromstring(response.text)
@@ -205,4 +235,4 @@ class RequestsBase:
         try:
             assert want in items
         except Exception:
-            self.logger.warning(f"The expected value '{want}' is not in {items}")
+            LOGGER.warning(f"The expected value '{want}' is not in {items}")

@@ -8,10 +8,12 @@ tframe中封装了多种测试常用第三方库, 详细的函数使用方法可
 root
 |___ data
 |  |___ <模块名>
-|     |___ <模块名>_data.py
+|     |___ __init__.py : 定义模块数据结构
+|     |___ <模块名>_data.py : 存放模块用到的数据
 |___ pages
 |  |___ <模块名>
-|     |___ <模块名>_pages.py (需要继承base_pages.py 中的 BasePages 类)
+|     |___ __init__.py : 初始化对应环境的BasePage
+|     |___ <模块名>_pages.py (需要继承BASE)
 |___ testcases
 |  |___ <模块名>
 |     |___ test_<模块名>.py (需要继承base_test.py 中的 BaseTest 类)
