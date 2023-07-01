@@ -48,3 +48,8 @@ Json数据可能会存在嵌套的情况, 因此我们使用该函数的过程�
 - response: Response
 - xpath: str
 - want: str
+
+## **get_token**
+可以使用此方法获取并保存响应信息中的token, 后续使用token时直接调用 `self.token` 即可
+- response: Response
+- expr: str

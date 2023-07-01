@@ -142,7 +142,7 @@ class AppiumBasePages:
 
 class RequestsBase:
     def __init__(self, driver: None):
-        pass
+        self.token = ""
 
     def _get_items_by_jsonpath(self, obj, expr: str) -> list | bool:
         return jsonpath.jsonpath(obj, expr)
@@ -198,13 +198,13 @@ class RequestsBase:
         self, response: Response, want: Any, expr: str = "$", overall: bool = False, has_no: bool = False
     ):
         root = response.json()
+        LOGGER.info(root)
 
         if overall:
             try:
                 # Most of the time our data structures are not passed in as dict
                 # So we need to do a data type conversion
                 want = want.__dict__
-                LOGGER.info(root)
                 assert want == root
             except Exception:
                 LOGGER.warning(f"{want} != {root}")
@@ -214,16 +214,15 @@ class RequestsBase:
         if not items:
             LOGGER.warning("JsonPath did not match the content")
 
+        LOGGER.info(f"get items after jsonpath: {items}")
         if has_no:
             try:
-                LOGGER.info(items)
                 assert want not in items
             except Exception:
                 LOGGER.warning(f"{want} still present in {items}")
             return
 
         try:
-            LOGGER.info(items)
             assert want in items
         except Exception:
             LOGGER.warning(f"{want} not in {items}")
@@ -236,3 +235,12 @@ class RequestsBase:
             assert want in items
         except Exception:
             LOGGER.warning(f"The expected value '{want}' is not in {items}")
+
+    def get_token(self, response: Response, expr: str):
+        root = response.json()
+        items = self._get_items_by_jsonpath(root, expr)
+        if not items:
+            LOGGER.warning("JsonPath did not match the content")
+
+        self.token = items[0]
+        LOGGER.info(f"tonken: {self.token}")
