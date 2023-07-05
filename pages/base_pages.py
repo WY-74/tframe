@@ -10,6 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
 from utils.data_sets import TimeOut, Methods
 from utils.decorator import avoid_popups
+from utils.jsonschema_util.jsonschema_util import JsonSchemaUtil
 from conftest import LOGGER
 
 
@@ -235,6 +236,12 @@ class RequestsBase:
             assert want in items
         except Exception:
             LOGGER.warning(f"The expected value '{want}' is not in {items}")
+
+    def assert_by_jsonschema(self, response: Response, generate: bool = True, file_path: str | None = None):
+        response = response.json()
+        if generate:
+            schema = JsonSchemaUtil.generate_jsonschema(response, file_path)
+        assert JsonSchemaUtil.validate_jsonschema(response, schema, file_path)
 
     def get_token(self, response: Response, expr: str):
         root = response.json()

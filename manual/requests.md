@@ -49,6 +49,20 @@ Json数据可能会存在嵌套的情况, 因此我们使用该函数的过程�
 - xpath: str
 - want: str
 
+## **assert_by_jsonschema**
+当我们对大数据采用类型/结构验证时(只关注数据类型和整体结构)可以用此方法, 此方法会依据响应生成JsonSchema, 利用JsonSchema进行断言
+
+`generate` 默认是T, 意味着每一次调用此方法都会依据响应生产新的JsonSchema; `file_path` 默认是None, 若我们传入一个路径调用此方法时会将JsonSchema存入/读取出文件. 我们可以利用这两个参数组合出不同的使用方法:
+| generate | file_path | 描述 |
+| -------- | -------- | -------- |
+| True | str | 生成新的JsonSchema并存入文件, 验证时通过读取文件内容验证 |
+| True | None | 生成新的JsonSchema并直接进行验证, 不进行存储和读取文件的过程 |
+| False | str | 不生成新的JsonSchema, 直接利用路径文件中的JsonSchema进行验证 |
+| False | None | 报错: No Json Schema is generated and no file is passed in |
+- response: Response
+- generate: bool
+- file_path: str|None
+
 ## **get_token**
 可以使用此方法获取并保存响应信息中的token, 后续使用token时直接调用 `self.token` 即可
 - response: Response
