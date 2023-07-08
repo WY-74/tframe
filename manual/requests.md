@@ -6,7 +6,7 @@ timeout我们也提供了预设的值: `utils/data_sets.py::TimeOut`, 且默认�
 - method: Method
 - url: str
 - params: Dict[str, str|int] | None
-- headers: Dict[str, str|int] | None
+- headers: Dict[str, str] | None
 - json_params: Any
 - data_params: Dict[str, str | int] | None
 - cookies: Dict[str, str | int] | None
@@ -73,3 +73,7 @@ Json数据可能会存在嵌套的情况, 因此我们使用该函数的过程�
 可以使用此方法获取并保存响应信息中的token, 后续使用token时直接调用 `self.token` 即可
 - response: Response
 - expr: str
+
+## **get_cookies**
+可以使用此方法获取并保存响应中的cookies, 后续使用cookies时直接调用 `self.cookies` 即可
+- response: Response

@@ -146,6 +146,7 @@ class AppiumBasePages:
 class RequestsBase:
     def __init__(self, driver: None):
         self.token = ""
+        self.cookies = {}
 
     def _get_items_by_jsonpath(self, obj, expr: str) -> list | bool:
         return jsonpath.jsonpath(obj, expr)
@@ -242,7 +243,7 @@ class RequestsBase:
             schema = JsonSchemaUtil.generate_jsonschema(response, file_path)
         assert JsonSchemaUtil.validate_jsonschema(response, schema, file_path)
 
-    def assert_from_db(self, sql: str, want: str | None = None, complete_match: bool = False):
+    def assert_from_db(self, sql: str, want: str = None, complete_match: bool = False):
         if complete_match and want == None:
             LOGGER.warning("[assert_from_db]: We need to pass in the 'want' or change the 'assert_mothod' to False!")
 
@@ -255,7 +256,13 @@ class RequestsBase:
         root = response.json()
         items = self._get_items_by_jsonpath(root, expr)
         if not items:
-            LOGGER.warning("JsonPath did not match the content")
+            LOGGER.warning("Get token JsonPath did not match the content")
 
         self.token = items[0]
         LOGGER.info(f"tonken: {self.token}")
+
+    def get_cookies(self, response: Response):
+        cookies = response.cookies
+        for cookie in cookies:
+            self.cookies[cookie.name] = cookie.value
+        LOGGER.info(f"cookies: {self.token}")
