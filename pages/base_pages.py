@@ -8,9 +8,11 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
-from utils.data_sets import TimeOut, Methods
+from utils.data_sets import TimeOut, Methods, AssertMethods
 from utils.decorator import avoid_popups
 from utils.jsonschema_util.jsonschema_util import JsonSchemaUtil
+from utils.db_util.mysql_util import MySqlUtil
+from utils.assert_util.assert_util import AssertUtil
 from conftest import LOGGER
 
 
@@ -189,11 +191,8 @@ class RequestsBase:
 
     def assert_status_code(self, response: Response, e_status: int = 200):
         status = response.status_code
-        try:
-            LOGGER.info(f"status: {e_status}")
-            assert status == e_status
-        except Exception:
-            LOGGER.warning(f"response status: {status} != expected status: {e_status}")
+        LOGGER.info(f"status: {e_status}")
+        AssertUtil.assert_with_log(status, e_status)
 
     def assert_json_response(
         self, response: Response, want: Any, expr: str = "$", overall: bool = False, has_no: bool = False
@@ -242,6 +241,15 @@ class RequestsBase:
         if generate:
             schema = JsonSchemaUtil.generate_jsonschema(response, file_path)
         assert JsonSchemaUtil.validate_jsonschema(response, schema, file_path)
+
+    def assert_from_db(self, sql: str, want: str | None = None, complete_match: bool = False):
+        if complete_match and want == None:
+            LOGGER.warning("[assert_from_db]: We need to pass in the 'want' or change the 'assert_mothod' to False!")
+
+        result = MySqlUtil.execute_sql(sql)
+        AssertUtil.assert_with_log(want, result) if complete_match else AssertUtil.assert_with_log(
+            None, result, AssertMethods.non_match
+        )
 
     def get_token(self, response: Response, expr: str):
         root = response.json()

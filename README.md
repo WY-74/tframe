@@ -23,8 +23,9 @@ root
 测试类命名需要以 Test 开头, 测试函数命名需要以 test_ 开头
 ```
 
-## 相关配置
+## 需要了解的相关配置
 - 框架依赖库安装 `pip install -r requirements.frozen`
+- 相关环境变量配置 `source docfg.sh`
 - playwright相关依赖: `python -m playwright install`
 - Chrome复用环境:
     - 找到Chrome启动路径
