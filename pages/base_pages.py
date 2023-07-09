@@ -1,20 +1,19 @@
 import requests
+import jsonpath
 from requests import Response
-from typing import Dict, List
+from xml.etree import ElementTree
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains, Keys
-
-from utils import data_sets
+from utils.data_sets import TimeOut, Methods, AssertMethods
 from utils.decorator import avoid_popups
-from utils.logger import Logger
-
-
-@dataclass
-class TimeOut:
-    normal: int = 10
+from utils.jsonschema_util.jsonschema_util import JsonSchemaUtil
+from utils.db_util.mysql_util import MySqlUtil
+from utils.assert_util.assert_util import AssertUtil
+from conftest import LOGGER
 
 
 class SeleniumBasePages:
@@ -146,54 +145,124 @@ class AppiumBasePages:
 
 class RequestsBase:
     def __init__(self, driver: None):
-        self.methods = data_sets.Methods()
-        self.logger = Logger(clear=True)
+        self.token = ""
+        self.cookies = {}
 
-    def _get_item_from_list(self, items: list, key: str, value: str):
-        for index, item in enumerate(items):
-            if item[key] == value:
-                return items[index]
-        return {}
+    def _get_items_by_jsonpath(self, obj, expr: str) -> list | bool:
+        return jsonpath.jsonpath(obj, expr)
 
     def http_methods(
         self,
-        method: data_sets.Methods(),
+        method: Methods,
         url: str,
         params: Dict[str, str | int] | None = None,
         headers: Dict[str, str | int] | None = None,
-        json_params: Dict[str, str | int] | None = None,
+        json_params: Any = None,
+        data_params: Dict[str, str | int] | None = None,
+        cookies: Dict[str, str | int] | None = None,
+        timeout: TimeOut = TimeOut.fast,
     ) -> Response:
-        return requests.request(method, url, params=params, headers=headers, json=json_params)
+        # Most of the time our data structures are not passed in as dict
+        # So we need to do a data type conversion
+        if json_params and not isinstance(json_params, dict):
+            json_params = json_params.__dict__
 
-    def assert_status_code(self, response: Response, e_status: int):
-        assert response.status_code == e_status
+        return requests.request(
+            method,
+            url,
+            params=params,
+            headers=headers,
+            json=json_params,
+            data=data_params,
+            cookies=cookies,
+            timeout=timeout,
+        )
+
+    def http_with_proxy(
+        self, method: Methods, url: str, http: str = "127.0.0.1:8888", https: str | None = None, **kwargs
+    ) -> Response:
+        https = http if https == None else https
+        proxies = {"http": f"http://{http}", "https": f"http://{https}"}
+        LOGGER.info(f"Proxy port information: {proxies}")
+        return requests.request(method, url, proxies=proxies, verify=False, **kwargs)
+
+    def http_with_file(self, url: str, path: str, name: str = "name by tframe", filename: str = ""):
+        files = {name: open(path, "rb")} if not filename else {name: (filename, open(path, "rb"))}
+        return requests.request(Methods.post, url, files=files)
+
+    def assert_status_code(self, response: Response, e_status: int = 200):
+        status = response.status_code
+        LOGGER.info(f"status: {e_status}")
+        AssertUtil.assert_with_log(status, e_status)
 
     def assert_json_response(
-        self, response: Response, want: Dict[str, str | int] = {}, key: str = "", value: str | int = ""
+        self, response: Response, want: Any, expr: str = "$", overall: bool = False, has_no: bool = False
     ):
-        if not want:
-            print("No expected data passed in, skip assertion")
+        root = response.json()
+        LOGGER.info(root)
+
+        if overall:
+            try:
+                # Most of the time our data structures are not passed in as dict
+                # So we need to do a data type conversion
+                want = want.__dict__
+                assert want == root
+            except Exception:
+                LOGGER.warning(f"{want} != {root}")
             return
 
-        current = response.json()
-        if isinstance(current, list):
-            if not key and not value:
-                raise Exception("After the json mapping is a list, it needs a unique key and its value")
-            current = self._get_item_from_list(current, key, value)
-        for keyword in want:
-            assert current[keyword] == want[keyword]
+        items = self._get_items_by_jsonpath(root, expr)
+        if not items:
+            LOGGER.warning("JsonPath did not match the content")
 
-    def assert_key_in_json(self, response: Response, want: str):
-        rep = response.json()
-        self.logger.info("Assert key in json")
-
-        if not isinstance(rep, dict):
-            war = "The response result cannot be mapped to a dictionary and the method cannot be used!!"
-            self.logger.warning(war)
-            raise Exception(war)
+        LOGGER.info(f"get items after jsonpath: {items}")
+        if has_no:
+            try:
+                assert want not in items
+            except Exception:
+                LOGGER.warning(f"{want} still present in {items}")
+            return
 
         try:
-            assert want in rep.keys()
-        except Exception as e:
-            self.logger.warning(f"The desired key is: {want}\nBut not in the response: {rep}")
-            raise e
+            assert want in items
+        except Exception:
+            LOGGER.warning(f"{want} not in {items}")
+
+    def assert_xml_response(self, response: Response, xpath: str, want: str):
+        root = ElementTree.fromstring(response.text)
+        items = root.findall(f".{xpath}")
+        items = [item.text for item in items]
+        try:
+            assert want in items
+        except Exception:
+            LOGGER.warning(f"The expected value '{want}' is not in {items}")
+
+    def assert_by_jsonschema(self, response: Response, generate: bool = True, file_path: str | None = None):
+        response = response.json()
+        if generate:
+            schema = JsonSchemaUtil.generate_jsonschema(response, file_path)
+        assert JsonSchemaUtil.validate_jsonschema(response, schema, file_path)
+
+    def assert_from_db(self, sql: str, want: str = None, complete_match: bool = False):
+        if complete_match and want == None:
+            LOGGER.warning("[assert_from_db]: We need to pass in the 'want' or change the 'assert_mothod' to False!")
+
+        result = MySqlUtil.execute_sql(sql)
+        AssertUtil.assert_with_log(want, result) if complete_match else AssertUtil.assert_with_log(
+            None, result, AssertMethods.non_match
+        )
+
+    def get_token(self, response: Response, expr: str):
+        root = response.json()
+        items = self._get_items_by_jsonpath(root, expr)
+        if not items:
+            LOGGER.warning("Get token JsonPath did not match the content")
+
+        self.token = items[0]
+        LOGGER.info(f"tonken: {self.token}")
+
+    def get_cookies(self, response: Response):
+        cookies = response.cookies
+        for cookie in cookies:
+            self.cookies[cookie.name] = cookie.value
+        LOGGER.info(f"cookies: {self.token}")
